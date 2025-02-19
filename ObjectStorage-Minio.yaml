@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: papermerge-minio-config
+data:
+  MINIO_ROOT_USER: 2e8817266261610810596a50b8f4a8c5
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: papermerge-minio-secret
+type: Opaque
+stringData:
+  MINIO_ROOT_PASSWORD: a503071debfa3ac0c1de1cd79f
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: papermerge-minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: papermerge-minio
+  template:
+    metadata:
+      labels:
+        app: papermerge-minio
+    spec:
+      containers:
+        - name: papermerge-minio
+          image: minio/minio:latest
+          command: [ "minio", "server", "--console-address", ":9001", "/data" ]
+          envFrom:
+            - configMapRef:
+                name: papermerge-minio-config
+            - secretRef:
+                name: papermerge-minio-secret
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001
+          volumeMounts:
+            - name: minio-storage
+              mountPath: /data
+      volumes:
+        - name: minio-storage
+          hostPath:
+            path: /minio-storage
+            type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  type: LoadBalancer
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 9000
+    - name: console
+      port: 9001
+      targetPort: 9001
+  selector:
+    app: minio

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: papermerge-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: papermerge-redis
+  template:
+    metadata:
+      labels:
+        app: papermerge-redis
+    spec:
+      containers:
+        - name: papermerge-redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: papermerge-redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: papermerge-redis
