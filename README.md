@@ -2,8 +2,8 @@
 
 Groupe : 6
 
-KONOVALOVA Sonia
-BOUBEKRI Nabil
+KONOVALOVA Sonia | 
+BOUBEKRI Nabil | 
 MINET Brice
 
 
